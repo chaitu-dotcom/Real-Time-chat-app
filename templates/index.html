@@ -1,68 +1,99 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Chat App</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-        }
-
-        #chat {
-            margin: auto;
-            background: #f1f1f1;
-            padding: 10px;
-            height: 200px;
-            width: 300px;
-            overflow-y: auto;
-            border: 1px solid black;
-        }
-
-        input {
-            padding: 5px;
-            margin: 5px;
-        }
-        button {
-            padding: 5px 10px;
-        }
-    </style>
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Chat | Flask Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<h2>Real-Time Chat</h2>
+<div class="main-wrapper">
+    <div class="chat-card">
+        
+        <div class="sidebar d-none d-md-flex">
+            <h5 class="mb-4">Presence</h5>
+            <div id="user-list">
+                </div>
+            <div class="mt-auto">
+                <hr style="border-color: rgba(255,255,255,0.1)">
+                <p class="small mb-1 text-muted">Logged in as:</p>
+                <p class="fw-bold text-info mb-3" style="color: #38bdf8 !important;">{{ username }}</p>
+                <a href="/" class="btn btn-sm btn-outline-danger w-100">Leave Room</a>
+            </div>
+        </div>
 
-<!-- Username -->
-<input id="username" type="text" placeholder="Enter your name"><br><br>
+        <div class="chat-main">
+            <div class="chat-header">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                    <h5 class="mb-0" style="color: white !important;"># {{ room }}</h5>
+                    <span class="badge bg-success" style="font-size: 0.6rem;">SOCKET ACTIVE</span>
+                </div>
+            </div>
 
-<div id="chat" style="border:1px solid black; height:200px; width:300px; overflow:auto;"></div>
+            <div id="chat-window">
+                {% for msg in messages %}
+                <div class="msg-bubble {% if msg.username == username %}msg-sent{% else %}msg-received{% endif %}">
+                    <div class="msg-info"><strong>{{ msg.username }}</strong></div>
+                    <div class="msg-content">{{ msg.content }}</div>
+                    <span class="timestamp">{{ msg.timestamp.strftime('%H:%M') }}</span>
+                </div>
+                {% endfor %}
+            </div>
 
-<input id="msg" type="text" placeholder="Type message">
-<button onclick="send()">Send</button>
+            <div class="input-area">
+                <form id="chat-form" class="d-flex gap-2">
+                    <input type="text" id="message-input" 
+                           class="form-control bg-dark text-white border-secondary" 
+                           placeholder="Type a message..." 
+                           autocomplete="off" required>
+                    <button type="submit" class="btn btn-primary px-4">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <script>
-var socket = io();
+    const socket = io();
+    const chatWindow = document.getElementById('chat-window');
 
-socket.on('message', function(msg){
-    document.getElementById("chat").innerHTML += "<p>"+msg+"</p>";
-});
-
-function send(){
-    var user = document.getElementById("username").value;
-    var m = document.getElementById("msg").value;
-
-    if(user === "" || m === ""){
-        alert("Enter username and message");
-        return;
+    // Function to scroll to bottom
+    function scrollToBottom() {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
     }
 
-    socket.send(user + ": " + m);
-    document.getElementById("msg").value = "";
-}
+    socket.emit('join', {username: "{{ username }}", room: "{{ room }}"});
+
+    socket.on('message', (data) => {
+        const div = document.createElement('div');
+        const isMe = data.username === "{{ username }}";
+        div.className = `msg-bubble ${isMe ? 'msg-sent' : 'msg-received'}`;
+        div.innerHTML = `
+            <div class="msg-info"><strong>${data.username}</strong></div>
+            <div class="msg-content">${data.message}</div>
+            <span class="timestamp">${data.timestamp}</span>
+        `;
+        chatWindow.appendChild(div);
+        
+        // --- THE FIX: Auto-scroll when a message arrives ---
+        scrollToBottom();
+    });
+
+    socket.on('status', (data) => {
+        const div = document.createElement('div');
+        div.className = 'system-msg';
+        div.innerText = data.msg;
+        chatWindow.appendChild(div);
+        
+        // Scroll for system messages too
+        scrollToBottom();
+    });
+
+    // Initial scroll on page load
+    window.onload = scrollToBottom;
 </script>
 
 </body>
