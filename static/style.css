@@ -1,23 +1,170 @@
+/* 1. Global Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    font-family: Arial;
+    background-color: #0f172a;
+    background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Keep the background static */
+}
+
+/* 2. Main Container */
+.chat-card {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    width: 95vw;
+    max-width: 1200px;
+    height: 90vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* 3. Sidebar */
+.sidebar {
+    width: 260px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+/* 4. Chat Main - THE SCROLL FIX */
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+#chat-window {
+    /* 1. Give it a specific height relative to the card */
+    flex: 1; 
+    height: 100%; 
+    
+    /* 2. Tell it what to do when content is too long */
+    overflow-y: auto; 
+    
+    /* 3. Padding so text doesn't touch the edges */
+    padding: 20px;
+    
+    /* 4. Layout logic */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Custom Scrollbar Visibility */
+#chat-window::-webkit-scrollbar {
+    width: 8px;
+}
+#chat-window::-webkit-scrollbar-thumb {
+    background: #38bdf8;
+    border-radius: 10px;
+}
+
+/* 5. Input Area - Locked at bottom */
+.input-area {
+    padding: 20px;
+    background: #1e293b;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 6. Message Styles & Colors */
+.msg-bubble {
+    padding: 12px 16px;
+    border-radius: 15px;
+    max-width: 75%;
+    word-wrap: break-word;
+}
+
+.msg-sent {
+    background: #38bdf8;
+    color: #0f172a;
+    align-self: flex-end;
+}
+
+.msg-received {
+    background: #334155;
+    color: #ffffff;
+    align-self: flex-start;
+}
+
+.system-msg {
+    color: #cbd5e1;
     text-align: center;
+    font-size: 0.85rem;
+    margin: 10px 0;
 }
 
-#chat-box {
-    width: 300px;
-    height: 300px;
-    border: 1px solid black;
-    margin: 20px auto;
-    overflow-y: scroll;
-    padding: 10px;
-    text-align: left;
+.user-list-item {
+    color: #38bdf8;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-input {
-    width: 200px;
-    padding: 5px;
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+/* LAYOUT FIXES */
+body {
+    background-color: #0f172a;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
 }
 
-button {
-    padding: 5px 10px;
+.main-wrapper {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.chat-card {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    width: 95vw;
+    height: 90vh;
+    display: flex;
+    overflow: hidden;
+}
+
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.input-area {
+    padding: 20px;
+    background: #1e293b;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.msg-bubble {
+    padding: 10px 15px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+    max-width: 70%;
+}
+
+.msg-sent { background: #38bdf8; color: #000 !important; align-self: flex-end; }
+.msg-received { background: #334155; color: #fff !important; align-self: flex-start; }
